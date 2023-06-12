@@ -1,1 +1,1 @@
-my readme for shell I/O redirections
+my readme for shell I/o
