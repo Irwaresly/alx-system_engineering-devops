@@ -1,2 +1,1 @@
-# alx-system_engineering-devops
-Probation stage ALX
+my readme on shell I/O
