@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Configure Nginx with custom header on web-01 and web-02
+
+# Update package list and install Nginx
+sudo apt-get update
+sudo apt-get -y install nginx
+
+# Configure firewall to allow requests through port 80
+sudo ufw allow 'Nginx HTTP'
+
+# Create web root directory
+sudo mkdir -p /var/www/html
+
+# Set permissions for web root
+sudo chmod -R 755 /var/www/html
+
+# Create index page
+echo 'Hello World!' | sudo tee /var/www/html/index.html
+
+# Create 404 error page
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
+
+# Configure Nginx for custom header and redirects
+nginx_config="
+server {
+    listen 80 default_server;
+    server_name _;
+
+    add_header X-Served-By \$(hostname);
+
+    location = /404.html {
+        root /var/www/html;
+        internal;
+    }
+
+    location /redirect_me {
+        return 301 https://www.blog.ehoneahobed.com;
+    }
+
+    # Additional server configurations...
+}
+"
+
+# Use a different delimiter to avoid escaping slashes
+sudo sed -i "s#server_name _;#$nginx_config#" /etc/nginx/sites-enabled/default
+
+# Restart Nginx to apply changes
+sudo service nginx restart
+
