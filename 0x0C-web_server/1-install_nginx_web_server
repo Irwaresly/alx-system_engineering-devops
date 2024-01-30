@@ -1,42 +1,7 @@
 #!/usr/bin/env bash
-
-# Install Nginx
-sudo apt-get update
-sudo apt-get -y install nginx
-
-# Configure Nginx
-sudo unlink /etc/nginx/sites-enabled/default  # Disable the default site
-sudo tee /etc/nginx/sites-available/default <<EOF
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-
-    root /var/www/html;
-    index index.html index.htm;
-
-    server_name _;
-
-    add_header X-Served-By $hostname;
-
-    location / {
-        return 200 "Hello World!";
-    }
-
-    location = /404.html {
-        internal;
-    }
-
-    error_page 404 /404.html;
-}
-EOF
-
-# Create the document root and the HTML file
-sudo mkdir -p /var/www/html
-sudo echo "Hello World!" | sudo tee /var/www/html/index.html
-
-# Enable the new configuration
-sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-
-# Restart Nginx
-sudo service nginx restart
-
+# Installs nginx server
+apt-get update
+apt-get -y install nginx
+ufw allow 'Nginx HTTP'
+echo "Hello World!" > /var/www/html/index.html
+service nginx start
