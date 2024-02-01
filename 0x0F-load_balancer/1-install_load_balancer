@@ -1,35 +1,37 @@
 #!/usr/bin/env bash
-# Install and set up HAProxy
+# Create a script to install and configure HAProxy on lb-01 server
+# Configure HAProxy to send traffic to web-01 and web-02 servers
+# Distribute requests using a round-robin algorithm
+# Make sure that HAProxy can be managed via an init script
 
-# Install required software
-apt-get update
-apt-get install -y software-properties-common
+# Install and configure HAProxy on my lb-01 server.
+sudo apt-get -y update
+sudo apt-get -y install haproxy
 
-# Add the HAProxy PPA and update the package list
-add-apt-repository -y ppa:vbernat/haproxy-2.4
-apt-get -y update
+# Edit the HAProxy configuration file
+sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOF
+defaults
+    timeout client 30s
+    timeout server 30s
+    timeout connect 5s
 
-# Install HAProxy with the specified version
-apt-get install -y haproxy=2.4.25-1ppa1~focal
+frontend silvia_frontend
+    bind *:80
+    mode http
+    default_backend silvia_backend
 
-# Enable HAProxy to start on boot
-echo "ENABLED=1" > /etc/default/haproxy
+backend silvia_backend
+    balance roundrobin
+    mode http
+    server web-01 100.26.159.155:80 check
+    server web-02 100.26.122.170:80 check
+EOF
 
-# Configure HAProxy
-echo "
-   frontend load_balancer
-   bind *:80
-   mode http
-   default_backend servers
+# Enable HAProxy to be started by an init script
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
 
-   backend servers
-   balance roundrobin
-   option httpclose
-   option forwardfor
-   server 448078-web-01 100.26.159.155:80 check
-   server 448078-web-02 100.26.122.170:80 check
-" >> /etc/haproxy/haproxy.cfg
+# Testing the HAProxy configuration file
+sudo haproxy -c -f /etc/haproxy/haproxy.cfg
 
-# Restart HAProxy to apply the changes
-service haproxy restart
-
+# Restart the HAProxy service
+sudo service haproxy restart
