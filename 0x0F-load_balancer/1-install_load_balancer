@@ -1,33 +1,21 @@
-#!/usr/bin/env bash
-# Installs and sets up HAProxy
+sudo apt-get install -y software-properties-common
+sudo add-apt-repository -y ppa:vbernat/haproxy-2.4
+sudo apt-get update
+sudo apt-get install -y haproxy=2.4.*
 
-# Update package lists
-apt-get update
+echo "ENABLED=1" | sudo tee /etc/default/haproxy
 
-# Install HAProxy
-apt-get install -y haproxy
-
-# Enable HAProxy
-echo "ENABLED=1" > /etc/default/haproxy
-
-# Configure HAProxy to listen to web1 and web2 servers
-echo "
+# Add HAProxy configuration
+sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOL
 frontend load_balancer
     bind *:80
     mode http
-    default_backend web_servers
-
-backend web_servers
     balance roundrobin
     option httpclose
     option forwardfor
     server web-01 100.26.159.155:80 check
     server web-02 100.26.122.170:80 check
-" > /etc/haproxy/haproxy.cfg
+EOL
 
-# Start HAProxy service
-service haproxy start
-
-# Output the required strings
-echo '["web-01", "web-02"]'
+sudo service haproxy start
 
