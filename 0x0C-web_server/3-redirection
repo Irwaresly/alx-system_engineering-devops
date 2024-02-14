@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Installs, configures, and starts the server
+#slyy
 apt-get update
 apt-get -y install nginx
 sudo ufw allow 'Nginx HTTP'
