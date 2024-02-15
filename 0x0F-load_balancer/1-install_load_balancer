@@ -23,8 +23,8 @@ frontend silvia_frontend
 backend silvia_backend
     balance roundrobin
     mode http
-    server web-01 100.26.159.155:80 check
-    server web-02 100.26.122.170:80 check
+    server web-01 18.206.202.33:80 check
+    server web-02 100.25.0.150:80 check
 EOF
 
 # Enable HAProxy to be started by an init script
