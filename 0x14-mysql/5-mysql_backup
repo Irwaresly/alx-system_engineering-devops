@@ -1,26 +1,5 @@
 #!/usr/bin/env bash
+# This script generates a MySQL dump and creates a compressed archive  of it
 
-LOG_FILE="backup_log.txt"
-
-{
-  # Exit script if any command fails
-  set -e
-
-  # Check if the MySQL password is provided
-  if [ -z "$1" ]; then
-    echo "Usage: $0 <mysql_password>"
-    exit 1
-  fi
-
-  # Generate MySQL dump
-  mysqldump -uroot -p"$1" --all-databases > backup.sql
-
-  # Create compressed archive
-  tar -czf "$(date +%d-%m-%Y)_backup.tar.gz" backup.sql
-
-  # Cleanup: Remove the temporary SQL dump
-  rm backup.sql
-
-  echo "Backup completed successfully."
-} >> "$LOG_FILE" 2>&1
-
+mysqldump -uroot -p"$1" --all-databases > backup.sql
+tar -czf $(date +%d-%m-%Y).tar.gz backup.sql
